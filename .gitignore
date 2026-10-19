@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv*/
+.env
+.env.*
+!.env.example
+secrets/
+orders/
+state/
+reports/
+*.sqlite3
+*.sqlite3-*
+*.key
+*.pem

@@ -1,0 +1,33 @@
+services:
+  trading-bot:
+    image: ${TRADING_BOT_IMAGE:-trading-bot:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      LIVE_TRADING_ENABLED: ${LIVE_TRADING_ENABLED:-false}
+      HELIUS_API_KEY: ${HELIUS_API_KEY:-}
+      JUPITER_API_KEY: ${JUPITER_API_KEY:-}
+      SOLANA_KEYPAIR_FILE: /run/secrets/trading-wallet.json
+      LIVE_ORDERS_DB: /state/orders.sqlite3
+      LIVE_ALLOWED_MINTS: ${LIVE_ALLOWED_MINTS:-So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v}
+      LIVE_MAX_INPUT_AMOUNTS: '${LIVE_MAX_INPUT_AMOUNTS:-{"So11111111111111111111111111111111111111112":"0.01","EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v":"1"}}'
+      LIVE_SOL_RESERVE: ${LIVE_SOL_RESERVE:-0.01}
+      LIVE_MAX_SLIPPAGE_BPS: ${LIVE_MAX_SLIPPAGE_BPS:-100}
+      LIVE_MAX_PRICE_IMPACT_PCT: ${LIVE_MAX_PRICE_IMPACT_PCT:-2}
+      LIVE_MAX_NETWORK_FEE_LAMPORTS: ${LIVE_MAX_NETWORK_FEE_LAMPORTS:-10000000}
+    volumes:
+      - order-state:/state
+      - ./orders:/orders:ro
+    secrets:
+      - source: trading-wallet
+        target: trading-wallet.json
+    command: ["--live-status"]
+secrets:
+  trading-wallet:
+    file: ${HOST_SOLANA_KEYPAIR_FILE:-./secrets/trading-wallet.json}
+volumes:
+  order-state:

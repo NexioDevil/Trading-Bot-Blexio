@@ -1,0 +1,7 @@
+{
+  "client_order_id": "replace-with-a-unique-order-id",
+  "input_mint": "So11111111111111111111111111111111111111112",
+  "output_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "amount": "0.001",
+  "slippage_bps": 50
+}

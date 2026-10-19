@@ -1,0 +1,12 @@
+# Optional CA trust for managed environments; the CA stays outside image layers.
+services:
+  trading-bot:
+    build:
+      secrets: [proxy_ca]
+    environment:
+      SSL_CERT_FILE: /run/ca-bundle.crt
+    volumes:
+      - /etc/ssl/certs/ca-certificates.crt:/run/ca-bundle.crt:ro
+secrets:
+  proxy_ca:
+    file: /etc/ssl/certs/ca-certificates.crt

@@ -1,0 +1,8 @@
+# Only these application files may enter the build context.
+**
+!Dockerfile
+!trading-bot/
+!trading-bot/bot.py
+!trading-bot/helius.py
+!trading-bot/live_trading.py
+!trading-bot/requirements.txt

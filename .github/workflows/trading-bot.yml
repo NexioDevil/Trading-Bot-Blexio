@@ -1,0 +1,37 @@
+name: Trading Bot Checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.10', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python scripts/check_publication.py
+      - name: Report historical commit privacy findings
+        run: |
+          if ! python scripts/check_publication.py --history; then
+            echo "::warning::Historical commit emails require a separately approved history cleanup."
+          fi
+      - run: python -m pip install -r trading-bot/requirements.txt
+      - run: python -m unittest discover -s tests -v
+        working-directory: trading-bot
+      - run: python trading-bot/bot.py --live-status
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: docker build -t trading-bot:ci .
+      - run: docker run --rm --network none trading-bot:ci --live-status
+      - run: docker compose --env-file .env.example config --quiet
+      - run: docker run --rm --network none --entrypoint python -v "$PWD/trading-bot/tests:/tests:ro" trading-bot:ci -m unittest discover -s /tests -v
